@@ -9,7 +9,10 @@ import {
   FileText, 
   TrendingUp,
   ArrowRight,
-  BrainCircuit
+  BrainCircuit,
+  Zap,
+  Search,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -62,13 +65,36 @@ const Dashboard = () => {
           <h2 className="text-3xl font-bold text-[#2d3154]">Olá, Dr. Ricardo</h2>
           <p className="text-muted-foreground">Seu desempenho clínico está 12% acima da média esta semana.</p>
         </div>
-        <Link to="/nova-consulta">
-          <Button className="btn-accent gap-2 h-12 px-6 rounded-xl shadow-lg shadow-orange-200">
-            <Plus size={20} />
-            Nova Consulta
+        <div className="flex gap-3">
+          <Button variant="outline" className="h-12 px-6 rounded-xl border-gray-200 bg-white gap-2">
+            <Search size={18} />
+            Buscar Paciente
           </Button>
-        </Link>
+          <Link to="/nova-consulta">
+            <Button className="btn-accent gap-2 h-12 px-6 rounded-xl shadow-lg shadow-orange-200">
+              <Plus size={20} />
+              Nova Consulta
+            </Button>
+          </Link>
+        </div>
       </header>
+
+      {/* Ações Rápidas */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Agenda", icon: CalendarIcon, color: "bg-blue-50 text-blue-600" },
+          { label: "Pacientes", icon: Users, color: "bg-purple-50 text-purple-600" },
+          { label: "Relatórios", icon: FileText, color: "bg-green-50 text-green-600" },
+          { label: "Insights", icon: Zap, color: "bg-yellow-50 text-yellow-600" },
+        ].map((action, i) => (
+          <Button key={i} variant="ghost" className="h-auto py-4 flex-col gap-2 rounded-2xl bg-white shadow-sm hover:shadow-md border-none">
+            <div className={`p-3 rounded-xl ${action.color}`}>
+              <action.icon size={20} />
+            </div>
+            <span className="text-xs font-bold text-[#2d3154]">{action.label}</span>
+          </Button>
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="Consultas Hoje" value="12" icon={Users} trend="+15%" />

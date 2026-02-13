@@ -7,7 +7,10 @@ import {
   Shield, 
   Database, 
   Smartphone,
-  Globe
+  Globe,
+  CreditCard,
+  Key,
+  Cloud
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -84,6 +87,28 @@ const Settings = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <Card className="border-none shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Cloud size={20} className="text-accent" />
+                  Integrações EHR
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground mb-4">Conecte o M-SCE ao seu sistema de prontuário eletrônico.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between">
+                    <span className="font-medium">Tasy / Philips</span>
+                    <Button variant="outline" size="sm" className="rounded-lg">Conectar</Button>
+                  </div>
+                  <div className="p-4 border border-gray-100 rounded-2xl flex items-center justify-between">
+                    <span className="font-medium">MV Soul</span>
+                    <Button variant="outline" size="sm" className="rounded-lg">Conectar</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="space-y-6">
@@ -107,7 +132,7 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl text-sm">
-                  <Shield size={16} /> Alterar Senha
+                  <Key size={16} /> Alterar Senha
                 </Button>
                 <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl text-sm">
                   <Smartphone size={16} /> Autenticação 2FA
