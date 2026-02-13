@@ -10,6 +10,7 @@ import {
   LogOut, 
   Stethoscope,
   Menu,
+  Users,
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -54,6 +55,13 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
         label="Nova Consulta" 
         href="/nova-consulta" 
         active={pathname === '/nova-consulta'} 
+        onClick={onItemClick}
+      />
+      <SidebarItem 
+        icon={Users} 
+        label="Pacientes" 
+        href="/pacientes" 
+        active={pathname === '/pacientes'} 
         onClick={onItemClick}
       />
       <SidebarItem 

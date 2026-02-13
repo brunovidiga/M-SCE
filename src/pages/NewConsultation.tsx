@@ -9,7 +9,10 @@ import {
   FileDown, 
   ChevronLeft,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Star,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,12 +21,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { showSuccess } from '@/utils/toast';
 import Layout from '@/components/Layout';
+import { cn } from '@/lib/utils';
 
 const NewConsultation = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [step, setStep] = useState(1); // 1: Recording, 2: Review/Edit
   const [transcription, setTranscription] = useState("");
   const [patientName, setPatientName] = useState("");
+  const [aiRating, setAiRating] = useState<number | null>(null);
   
   // Mock transcription effect
   useEffect(() => {
@@ -139,7 +144,7 @@ const NewConsultation = () => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
             <div className="lg:col-span-2 space-y-6">
               <Card className="border-none shadow-sm">
                 <CardContent className="p-8 space-y-8">
@@ -227,6 +232,39 @@ const NewConsultation = () => {
                       Exportar PDF
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-none shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Avaliar Precisão da IA</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-xs text-muted-foreground">Seu feedback ajuda a melhorar a qualidade das anamneses geradas.</p>
+                  <div className="flex justify-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className={cn("rounded-full w-12 h-12", aiRating === 1 && "bg-green-100 border-green-500 text-green-600")}
+                      onClick={() => setAiRating(1)}
+                    >
+                      <ThumbsUp size={20} />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className={cn("rounded-full w-12 h-12", aiRating === 0 && "bg-red-100 border-red-500 text-red-600")}
+                      onClick={() => setAiRating(0)}
+                    >
+                      <ThumbsDown size={20} />
+                    </Button>
+                  </div>
+                  {aiRating !== null && (
+                    <Textarea 
+                      placeholder="O que poderia ser melhor? (Opcional)" 
+                      className="text-xs rounded-xl min-h-[60px]"
+                    />
+                  )}
                 </CardContent>
               </Card>
 
