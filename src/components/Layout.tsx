@@ -13,7 +13,7 @@ import {
   Users,
   Wifi,
   WifiOff,
-  RefreshCw
+  Calendar as CalendarIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -58,6 +58,7 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
 
       <nav className="flex-1 space-y-2">
         <SidebarItem icon={LayoutDashboard} label="Dashboard" href="/" active={pathname === '/'} onClick={onItemClick} />
+        <SidebarItem icon={CalendarIcon} label="Agenda" href="/agenda" active={pathname === '/agenda'} onClick={onItemClick} />
         <SidebarItem icon={PlusCircle} label="Nova Consulta" href="/nova-consulta" active={pathname === '/nova-consulta'} onClick={onItemClick} />
         <SidebarItem icon={Users} label="Pacientes" href="/pacientes" active={pathname === '/pacientes'} onClick={onItemClick} />
         <SidebarItem icon={History} label="Histórico" href="/historico" active={pathname === '/historico'} onClick={onItemClick} />
