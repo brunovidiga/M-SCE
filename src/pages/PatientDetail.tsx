@@ -16,7 +16,8 @@ import {
   Clock,
   FileSearch,
   Image as ImageIcon,
-  UserPlus
+  UserPlus,
+  Mic
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +34,7 @@ import {
 } from 'recharts';
 import Layout from '@/components/Layout';
 import ReferralDialog from '@/components/ReferralDialog';
+import ConsultationRecording from '@/components/ConsultationRecording';
 
 const vitalData = [
   { date: '01/01', pa: 130, glicemia: 110 },
@@ -160,10 +162,14 @@ const PatientDetail = () => {
           {/* Conteúdo Principal com Abas */}
           <div className="lg:col-span-3 space-y-6">
             <Tabs defaultValue="evolution" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-md p-1 shadow-sm">
+              <TabsList className="grid w-full grid-cols-4 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-md p-1 shadow-sm">
                 <TabsTrigger value="evolution" className="rounded-xl">Evolução</TabsTrigger>
-                <TabsTrigger value="timeline" className="rounded-xl">Linha do Tempo</TabsTrigger>
-                <TabsTrigger value="documents" className="rounded-xl">Exames e Arquivos</TabsTrigger>
+                <TabsTrigger value="recordings" className="rounded-xl gap-2">
+                  <Mic size={14} />
+                  Consultas
+                </TabsTrigger>
+                <TabsTrigger value="timeline" className="rounded-xl">Histórico</TabsTrigger>
+                <TabsTrigger value="documents" className="rounded-xl">Exames</TabsTrigger>
               </TabsList>
 
               <TabsContent value="evolution" className="space-y-6 pt-4">
@@ -191,6 +197,10 @@ const PatientDetail = () => {
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="recordings" className="pt-4">
+                <ConsultationRecording />
               </TabsContent>
 
               <TabsContent value="timeline" className="pt-4">
