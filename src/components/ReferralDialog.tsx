@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { showSuccess } from '@/utils/toast';
+import { cn } from '@/lib/utils';
 
 const specialists = [
   { id: 1, name: "Dra. Ana Paula", specialty: "Neurologia", hospital: "Hospital Central" },
