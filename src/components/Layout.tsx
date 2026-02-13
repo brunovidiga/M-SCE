@@ -17,12 +17,14 @@ import {
   BarChart3,
   Search,
   Bell,
-  Video
+  Video,
+  Calculator
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import ThemeToggle from './ThemeToggle';
 
 const SidebarItem = ({ icon: Icon, label, href, active, onClick }: { icon: any, label: string, href: string, active: boolean, onClick?: () => void }) => (
   <Link
@@ -32,7 +34,7 @@ const SidebarItem = ({ icon: Icon, label, href, active, onClick }: { icon: any, 
       "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
       active 
         ? "bg-primary text-primary-foreground shadow-sm" 
-        : "text-muted-foreground hover:bg-white hover:text-foreground"
+        : "text-muted-foreground hover:bg-white hover:text-foreground dark:hover:bg-white/10"
     )}
   >
     <Icon size={20} className={cn(active ? "text-primary-foreground" : "group-hover:text-accent")} />
@@ -50,7 +52,7 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
           <div className="bg-[#fb9262] p-2 rounded-lg shadow-lg shadow-orange-200">
             <Stethoscope className="text-white" size={24} />
           </div>
-          <h1 className="font-bold text-xl tracking-tight text-[#2d3154]">M-SCE</h1>
+          <h1 className="font-bold text-xl tracking-tight text-[#2d3154] dark:text-white">M-SCE</h1>
         </div>
         <div className={cn(
           "flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter",
@@ -68,6 +70,7 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
         <SidebarItem icon={PlusCircle} label="Nova Consulta" href="/nova-consulta" active={pathname === '/nova-consulta'} onClick={onItemClick} />
         <SidebarItem icon={Users} label="Pacientes" href="/pacientes" active={pathname === '/pacientes'} onClick={onItemClick} />
         <SidebarItem icon={History} label="Histórico" href="/historico" active={pathname === '/historico'} onClick={onItemClick} />
+        <SidebarItem icon={Calculator} label="Calculadoras" href="/calculadoras" active={pathname === '/calculadoras'} onClick={onItemClick} />
         <SidebarItem icon={BarChart3} label="Relatórios" href="/relatorios" active={pathname === '/relatorios'} onClick={onItemClick} />
         <SidebarItem icon={Settings} label="Configurações" href="/configuracoes" active={pathname === '/configuracoes'} onClick={onItemClick} />
       </nav>
@@ -78,11 +81,11 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
             DR
           </div>
           <div className="overflow-hidden">
-            <p className="text-sm font-semibold truncate">Dr. Ricardo Silva</p>
+            <p className="text-sm font-semibold truncate dark:text-white">Dr. Ricardo Silva</p>
             <p className="text-xs text-muted-foreground truncate">CRM: 123456-SP</p>
           </div>
         </div>
-        <button className="flex items-center gap-3 px-4 py-3 w-full text-red-500 hover:bg-red-50 rounded-xl transition-colors">
+        <button className="flex items-center gap-3 px-4 py-3 w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">
           <LogOut size={20} />
           <span className="font-medium">Sair</span>
         </button>
@@ -96,15 +99,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#e8e5e9]">
+    <div className="flex min-h-screen bg-[#e8e5e9] dark:bg-background">
       {/* Desktop Sidebar */}
-      <aside className="w-64 bg-white/50 backdrop-blur-lg border-r border-white/20 p-6 flex flex-col hidden md:flex fixed h-full z-50">
+      <aside className="w-64 bg-white/50 dark:bg-card/50 backdrop-blur-lg border-r border-white/20 dark:border-white/5 p-6 flex flex-col hidden md:flex fixed h-full z-50">
         <SidebarContent pathname={location.pathname} />
       </aside>
 
       <div className="flex-1 flex flex-col md:pl-64">
         {/* Top Header */}
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
+        <header className="h-16 bg-white/80 dark:bg-card/80 backdrop-blur-md border-b border-gray-200/50 dark:border-white/5 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
             <div className="md:hidden">
               <Sheet open={open} onOpenChange={setOpen}>
@@ -123,20 +126,21 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input 
                 placeholder="Busca global (Paciente, CPF, CID...)" 
-                className="pl-10 h-10 bg-gray-100/50 border-none rounded-xl focus-visible:ring-primary w-full"
+                className="pl-10 h-10 bg-gray-100/50 dark:bg-white/5 border-none rounded-xl focus-visible:ring-primary w-full"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" className="relative rounded-full">
               <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-white" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-white dark:border-background" />
             </Button>
-            <div className="h-8 w-px bg-gray-200 mx-2 hidden md:block" />
+            <div className="h-8 w-px bg-gray-200 dark:bg-white/10 mx-2 hidden md:block" />
             <div className="flex items-center gap-3">
               <div className="text-right hidden lg:block">
-                <p className="text-xs font-bold text-[#2d3154]">Dr. Ricardo Silva</p>
+                <p className="text-xs font-bold text-[#2d3154] dark:text-white">Dr. Ricardo Silva</p>
                 <p className="text-[10px] text-muted-foreground">Disponível</p>
               </div>
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
