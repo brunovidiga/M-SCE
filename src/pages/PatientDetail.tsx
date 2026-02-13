@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -13,11 +13,15 @@ import {
   Download,
   MoreHorizontal,
   TrendingUp,
-  Clock
+  Clock,
+  FileSearch,
+  Image as ImageIcon,
+  FileCode
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   LineChart, 
   Line, 
@@ -53,6 +57,11 @@ const PatientDetail = () => {
       { id: 1, date: "24/05/2024", type: "Consulta de Rotina", summary: "Paciente estável, pressão controlada.", doctor: "Dr. Ricardo Silva" },
       { id: 2, date: "12/02/2024", type: "Retorno", summary: "Ajuste de dosagem de Losartana.", doctor: "Dr. Ricardo Silva" },
       { id: 3, date: "15/11/2023", type: "Emergência", summary: "Crise hipertensiva leve.", doctor: "Dra. Ana Paula" },
+    ],
+    documents: [
+      { id: 1, name: "Hemograma Completo.pdf", date: "20/05/2024", type: "Laboratório", size: "1.2 MB" },
+      { id: 2, name: "Raio-X Tórax.jpg", date: "15/04/2024", type: "Imagem", size: "4.5 MB" },
+      { id: 3, name: "Eletrocardiograma.pdf", date: "10/03/2024", type: "Cardiologia", size: "850 KB" },
     ]
   };
 
@@ -141,66 +150,101 @@ const PatientDetail = () => {
             </Card>
           </div>
 
-          {/* Conteúdo Principal */}
+          {/* Conteúdo Principal com Abas */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Gráfico de Evolução */}
-            <Card className="border-none shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <TrendingUp size={20} className="text-accent" />
-                  Evolução Clínica
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100">P.A. Sistólica</Badge>
-                  <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-100">Glicemia</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={vitalData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                    <Line type="monotone" dataKey="pa" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} />
-                    <Line type="monotone" dataKey="glicemia" stroke="#fb9262" strokeWidth={3} dot={{ r: 4, fill: '#fb9262' }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            <Tabs defaultValue="evolution" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 rounded-2xl bg-white/50 backdrop-blur-md p-1 shadow-sm">
+                <TabsTrigger value="evolution" className="rounded-xl">Evolução</TabsTrigger>
+                <TabsTrigger value="timeline" className="rounded-xl">Linha do Tempo</TabsTrigger>
+                <TabsTrigger value="documents" className="rounded-xl">Exames e Arquivos</TabsTrigger>
+              </TabsList>
 
-            {/* Timeline de Consultas */}
-            <Card className="border-none shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <Clock size={20} className="text-primary-foreground" />
-                  Linha do Tempo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 relative before:absolute before:left-[31px] before:top-8 before:bottom-8 before:w-0.5 before:bg-gray-100">
-                {patient.history.map((item, index) => (
-                  <div key={item.id} className="relative pl-12 group">
-                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center z-10 group-hover:border-primary transition-colors">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+              <TabsContent value="evolution" className="space-y-6 pt-4">
+                <Card className="border-none shadow-sm">
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                      <TrendingUp size={20} className="text-accent" />
+                      Evolução Clínica
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100">P.A. Sistólica</Badge>
+                      <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-100">Glicemia</Badge>
                     </div>
-                    <div className="p-4 rounded-2xl border border-gray-100 hover:border-primary/30 transition-all hover:shadow-sm cursor-pointer bg-white">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-bold text-[#2d3154]">{item.type}</p>
-                          <p className="text-xs text-muted-foreground">{item.date} • {item.doctor}</p>
+                  </CardHeader>
+                  <CardContent className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={vitalData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                        <Line type="monotone" dataKey="pa" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} />
+                        <Line type="monotone" dataKey="glicemia" stroke="#fb9262" strokeWidth={3} dot={{ r: 4, fill: '#fb9262' }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="pt-4">
+                <Card className="border-none shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                      <Clock size={20} className="text-primary-foreground" />
+                      Histórico de Consultas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 relative before:absolute before:left-[31px] before:top-8 before:bottom-8 before:w-0.5 before:bg-gray-100">
+                    {patient.history.map((item) => (
+                      <div key={item.id} className="relative pl-12 group">
+                        <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center z-10 group-hover:border-primary transition-colors">
+                          <div className="w-2 h-2 rounded-full bg-primary" />
                         </div>
-                        <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
-                          <MoreHorizontal size={16} />
-                        </Button>
+                        <div className="p-4 rounded-2xl border border-gray-100 hover:border-primary/30 transition-all hover:shadow-sm cursor-pointer bg-white">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <p className="font-bold text-[#2d3154]">{item.type}</p>
+                              <p className="text-xs text-muted-foreground">{item.date} • {item.doctor}</p>
+                            </div>
+                            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+                              <MoreHorizontal size={16} />
+                            </Button>
+                          </div>
+                          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-2 italic">
+                            "{item.summary}"
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-2 italic">
-                        "{item.summary}"
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="documents" className="pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {patient.documents.map((doc) => (
+                    <Card key={doc.id} className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                          {doc.type === "Imagem" ? <ImageIcon size={24} /> : <FileSearch size={24} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm text-[#2d3154] truncate">{doc.name}</p>
+                          <p className="text-[10px] text-muted-foreground">{doc.date} • {doc.type} • {doc.size}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                          <Download size={18} />
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <Button variant="outline" className="h-auto py-8 border-dashed border-2 rounded-2xl flex-col gap-2 text-muted-foreground hover:text-primary hover:border-primary">
+                    <Plus size={24} />
+                    <span className="text-xs font-bold">Upload de Novo Exame</span>
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
+import Telemedicine from "./pages/Telemedicine";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/agenda" element={<Agenda />} />
+          <Route path="/telemedicina" element={<Telemedicine />} />
           <Route path="/nova-consulta" element={<NewConsultation />} />
           <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
           <Route path="/pacientes/:id" element={<PatientDetail />} />

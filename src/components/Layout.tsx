@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -14,10 +14,14 @@ import {
   Wifi,
   WifiOff,
   Calendar as CalendarIcon,
-  BarChart3
+  BarChart3,
+  Search,
+  Bell,
+  Video
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const SidebarItem = ({ icon: Icon, label, href, active, onClick }: { icon: any, label: string, href: string, active: boolean, onClick?: () => void }) => (
@@ -37,7 +41,7 @@ const SidebarItem = ({ icon: Icon, label, href, active, onClick }: { icon: any, 
 );
 
 const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline] = useState(true);
 
   return (
     <div className="flex flex-col h-full">
@@ -60,6 +64,7 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
       <nav className="flex-1 space-y-2">
         <SidebarItem icon={LayoutDashboard} label="Dashboard" href="/" active={pathname === '/'} onClick={onItemClick} />
         <SidebarItem icon={CalendarIcon} label="Agenda" href="/agenda" active={pathname === '/agenda'} onClick={onItemClick} />
+        <SidebarItem icon={Video} label="Telemedicina" href="/telemedicina" active={pathname === '/telemedicina'} onClick={onItemClick} />
         <SidebarItem icon={PlusCircle} label="Nova Consulta" href="/nova-consulta" active={pathname === '/nova-consulta'} onClick={onItemClick} />
         <SidebarItem icon={Users} label="Pacientes" href="/pacientes" active={pathname === '/pacientes'} onClick={onItemClick} />
         <SidebarItem icon={History} label="Histórico" href="/historico" active={pathname === '/historico'} onClick={onItemClick} />
@@ -92,34 +97,61 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex min-h-screen bg-[#e8e5e9]">
-      <aside className="w-64 bg-white/50 backdrop-blur-lg border-r border-white/20 p-6 flex flex-col hidden md:flex">
+      {/* Desktop Sidebar */}
+      <aside className="w-64 bg-white/50 backdrop-blur-lg border-r border-white/20 p-6 flex flex-col hidden md:flex fixed h-full z-50">
         <SidebarContent pathname={location.pathname} />
       </aside>
 
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="bg-[#fb9262] p-1.5 rounded-lg">
-            <Stethoscope className="text-white" size={18} />
+      <div className="flex-1 flex flex-col md:pl-64">
+        {/* Top Header */}
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-4 flex-1 max-w-xl">
+            <div className="md:hidden">
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu size={24} />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-6">
+                  <SidebarContent pathname={location.pathname} onItemClick={() => setOpen(false)} />
+                </SheetContent>
+              </Sheet>
+            </div>
+            
+            <div className="relative w-full hidden sm:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Input 
+                placeholder="Busca global (Paciente, CPF, CID...)" 
+                className="pl-10 h-10 bg-gray-100/50 border-none rounded-xl focus-visible:ring-primary w-full"
+              />
+            </div>
           </div>
-          <span className="font-bold text-lg text-[#2d3154]">M-SCE</span>
-        </div>
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu size={24} />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-6">
-            <SidebarContent pathname={location.pathname} onItemClick={() => setOpen(false)} />
-          </SheetContent>
-        </Sheet>
-      </div>
 
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-20 md:pt-8">
-        <div className="max-w-6xl mx-auto">
-          {children}
-        </div>
-      </main>
+          <div className="flex items-center gap-2 md:gap-4">
+            <Button variant="ghost" size="icon" className="relative rounded-full">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-white" />
+            </Button>
+            <div className="h-8 w-px bg-gray-200 mx-2 hidden md:block" />
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden lg:block">
+                <p className="text-xs font-bold text-[#2d3154]">Dr. Ricardo Silva</p>
+                <p className="text-[10px] text-muted-foreground">Disponível</p>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
+                RS
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 p-4 md:p-8">
+          <div className="max-w-6xl mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
