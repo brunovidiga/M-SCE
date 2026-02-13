@@ -9,6 +9,7 @@ import History from "./pages/History";
 import Patients from "./pages/Patients";
 import PatientDetail from "./pages/PatientDetail";
 import Agenda from "./pages/Agenda";
+import Reports from "./pages/Reports";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
           <Route path="/pacientes/:id" element={<PatientDetail />} />
           <Route path="/historico" element={<Layout><History /></Layout>} />
+          <Route path="/relatorios" element={<Reports />} />
           <Route path="/configuracoes" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

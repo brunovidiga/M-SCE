@@ -13,7 +13,9 @@ import {
   ThumbsUp,
   ThumbsDown,
   ShieldCheck,
-  VolumeX
+  VolumeX,
+  Stethoscope,
+  Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,7 +33,6 @@ const NewConsultation = () => {
   const [step, setStep] = useState(1);
   const [transcription, setTranscription] = useState("");
   const [patientName, setPatientName] = useState("");
-  const [aiRating, setAiRating] = useState<number | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
   const [noiseFilter, setNoiseFilter] = useState(true);
   
@@ -201,6 +202,44 @@ const NewConsultation = () => {
                         <Label className="text-accent font-bold uppercase text-xs tracking-wider">Hábitos de Vida</Label>
                         <Textarea value={anamnesis.habitos} className="min-h-[80px] rounded-xl" />
                       </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Suporte à Decisão Clínica (CDS) */}
+              <Card className="border-none shadow-sm bg-blue-50/50 border border-blue-100">
+                <CardContent className="p-8 space-y-6">
+                  <div className="flex items-center gap-2 text-blue-700">
+                    <Lightbulb size={24} />
+                    <h3 className="text-lg font-bold">Suporte à Decisão Clínica (IA)</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Exames Sugeridos</p>
+                      <ul className="space-y-2">
+                        <li className="flex items-center gap-2 text-sm bg-white p-2 rounded-lg border border-blue-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          Hemograma Completo
+                        </li>
+                        <li className="flex items-center gap-2 text-sm bg-white p-2 rounded-lg border border-blue-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          Tomografia de Crânio (se sinais de alerta)
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Condutas Recomendadas</p>
+                      <ul className="space-y-2">
+                        <li className="flex items-center gap-2 text-sm bg-white p-2 rounded-lg border border-blue-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          Prescrever Triptanos para crise aguda
+                        </li>
+                        <li className="flex items-center gap-2 text-sm bg-white p-2 rounded-lg border border-blue-100">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                          Orientar diário de cefaleia
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </CardContent>
