@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   UserPlus, 
   MoreHorizontal, 
   Phone, 
   Mail,
-  Calendar
+  Calendar,
+  ArrowRight
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,7 @@ import Layout from '@/components/Layout';
 
 const Patients = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const patients = [
     { id: 1, name: "Maria Oliveira", cpf: "123.456.789-00", lastVisit: "24/05/2024", phone: "(11) 98765-4321" },
@@ -30,6 +33,11 @@ const Patients = () => {
     { id: 4, name: "Pedro Rocha", cpf: "456.789.012-33", lastVisit: "22/05/2024", phone: "(11) 98888-7777" },
     { id: 5, name: "Carla Mendes", cpf: "567.890.123-44", lastVisit: "21/05/2024", phone: "(11) 99999-0000" },
   ];
+
+  const filteredPatients = patients.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.cpf.includes(searchTerm)
+  );
 
   return (
     <Layout>
@@ -48,7 +56,7 @@ const Patients = () => {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
           <Input 
-            placeholder="Buscar por nome, CPF ou telefone..." 
+            placeholder="Buscar por nome ou CPF..." 
             className="pl-12 h-14 rounded-2xl border-none shadow-sm bg-white"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -56,7 +64,7 @@ const Patients = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {patients.map((patient) => (
+          {filteredPatients.map((patient) => (
             <Card key={patient.id} className="border-none shadow-sm hover:shadow-md transition-all group overflow-hidden">
               <CardContent className="p-0">
                 <div className="p-6 space-y-4">
@@ -71,7 +79,7 @@ const Patients = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="rounded-xl">
-                        <DropdownMenuItem>Ver Prontuário</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/pacientes/${patient.id}`)}>Ver Prontuário</DropdownMenuItem>
                         <DropdownMenuItem>Editar Cadastro</DropdownMenuItem>
                         <DropdownMenuItem className="text-red-500">Excluir</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -94,9 +102,23 @@ const Patients = () => {
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" className="w-full rounded-none h-12 border-t border-gray-50 text-accent font-semibold hover:bg-accent/5">
-                  Nova Consulta
-                </Button>
+                <div className="flex border-t border-gray-50">
+                  <Button 
+                    variant="ghost" 
+                    className="flex-1 rounded-none h-12 text-accent font-semibold hover:bg-accent/5 border-r border-gray-50"
+                    onClick={() => navigate('/nova-consulta')}
+                  >
+                    Nova Consulta
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="flex-1 rounded-none h-12 text-primary-foreground font-semibold hover:bg-primary/5"
+                    onClick={() => navigate(`/pacientes/${patient.id}`)}
+                  >
+                    Prontuário
+                    <ArrowRight size={16} className="ml-2" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

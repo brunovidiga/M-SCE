@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import NewConsultation from "./pages/NewConsultation";
 import History from "./pages/History";
 import Patients from "./pages/Patients";
+import PatientDetail from "./pages/PatientDetail";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/nova-consulta" element={<NewConsultation />} />
           <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
+          <Route path="/pacientes/:id" element={<PatientDetail />} />
           <Route path="/historico" element={<Layout><History /></Layout>} />
           <Route path="/configuracoes" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
