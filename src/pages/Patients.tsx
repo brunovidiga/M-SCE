@@ -9,7 +9,8 @@ import {
   Phone, 
   Mail,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  Filter
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import Layout from '@/components/Layout';
+import NewPatientDialog from '@/components/NewPatientDialog';
 
 const Patients = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,20 +49,28 @@ const Patients = () => {
             <h2 className="text-3xl font-bold text-[#2d3154]">Pacientes</h2>
             <p className="text-muted-foreground">Gerencie o cadastro e histórico de seus pacientes.</p>
           </div>
-          <Button className="btn-accent gap-2 rounded-xl h-12">
-            <UserPlus size={20} />
-            Novo Paciente
-          </Button>
+          <NewPatientDialog>
+            <Button className="btn-accent gap-2 rounded-xl h-12 shadow-lg shadow-orange-100">
+              <UserPlus size={20} />
+              Novo Paciente
+            </Button>
+          </NewPatientDialog>
         </header>
 
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-          <Input 
-            placeholder="Buscar por nome ou CPF..." 
-            className="pl-12 h-14 rounded-2xl border-none shadow-sm bg-white"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <Input 
+              placeholder="Buscar por nome ou CPF..." 
+              className="pl-12 h-14 rounded-2xl border-none shadow-sm bg-white"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline" className="h-14 px-6 rounded-2xl bg-white border-none shadow-sm gap-2">
+            <Filter size={20} />
+            Filtros
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
