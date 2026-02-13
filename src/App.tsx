@@ -7,6 +7,8 @@ import Dashboard from "./pages/Dashboard";
 import NewConsultation from "./pages/NewConsultation";
 import History from "./pages/History";
 import Login from "./pages/Login";
+import Onboarding from "./pages/Onboarding";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 
@@ -20,9 +22,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/nova-consulta" element={<NewConsultation />} />
           <Route path="/historico" element={<Layout><History /></Layout>} />
+          <Route path="/configuracoes" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
