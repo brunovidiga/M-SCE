@@ -8,7 +8,9 @@ import {
   Fingerprint, 
   Phone, 
   Mail,
-  Check
+  Check,
+  AlertTriangle,
+  Pill
 } from 'lucide-react';
 import {
   Dialog,
@@ -22,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select, 
   SelectContent, 
@@ -44,7 +47,9 @@ const NewPatientDialog = ({ children, onSave }: NewPatientDialogProps) => {
     birth: '',
     gender: '',
     phone: '',
-    email: ''
+    email: '',
+    allergies: '',
+    medications: ''
   });
 
   const handleSave = () => {
@@ -56,13 +61,18 @@ const NewPatientDialog = ({ children, onSave }: NewPatientDialogProps) => {
       id: Date.now(),
       name: formData.name,
       cpf: formData.cpf,
+      birth: formData.birth,
+      gender: formData.gender === 'f' ? 'Feminino' : formData.gender === 'm' ? 'Masculino' : 'Outro',
       lastVisit: new Date().toLocaleDateString('pt-BR'),
-      phone: formData.phone || "Não informado"
+      phone: formData.phone || "Não informado",
+      email: formData.email,
+      allergies: formData.allergies.split(',').map(s => s.trim()).filter(s => s !== ""),
+      medications: formData.medications.split(',').map(s => s.trim()).filter(s => s !== "")
     };
 
     onSave(newPatient);
     showSuccess("Paciente cadastrado com sucesso!");
-    setFormData({ name: '', cpf: '', birth: '', gender: '', phone: '', email: '' });
+    setFormData({ name: '', cpf: '', birth: '', gender: '', phone: '', email: '', allergies: '', medications: '' });
     setOpen(false);
   };
 
@@ -71,14 +81,14 @@ const NewPatientDialog = ({ children, onSave }: NewPatientDialogProps) => {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[550px] rounded-3xl">
+      <DialogContent className="sm:max-w-[600px] rounded-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#2d3154] flex items-center gap-2">
             <UserPlus className="text-accent" />
             Novo Paciente
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados básicos para iniciar o prontuário digital.
+            Preencha os dados básicos e clínicos para iniciar o prontuário.
           </DialogDescription>
         </DialogHeader>
         
@@ -141,33 +151,32 @@ const NewPatientDialog = ({ children, onSave }: NewPatientDialogProps) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone / WhatsApp</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                <Input 
-                  id="phone" 
-                  placeholder="(00) 00000-0000" 
-                  className="pl-10 rounded-xl" 
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                <Input 
-                  id="email" 
-                  placeholder="paciente@email.com" 
-                  className="pl-10 rounded-xl" 
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="allergies" className="flex items-center gap-2">
+              <AlertTriangle size={14} className="text-red-500" />
+              Alergias (separadas por vírgula)
+            </Label>
+            <Textarea 
+              id="allergies" 
+              placeholder="Ex: Dipirona, Penicilina, Frutos do mar" 
+              className="rounded-xl min-h-[80px]"
+              value={formData.allergies}
+              onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="medications" className="flex items-center gap-2">
+              <Pill size={14} className="text-accent" />
+              Medicamentos Ativos (separados por vírgula)
+            </Label>
+            <Textarea 
+              id="medications" 
+              placeholder="Ex: Losartana 50mg, Metformina 850mg" 
+              className="rounded-xl min-h-[80px]"
+              value={formData.medications}
+              onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
+            />
           </div>
         </div>
 

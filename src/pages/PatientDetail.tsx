@@ -21,12 +21,15 @@ import {
   FileDown,
   Upload,
   X,
-  Eye
+  Eye,
+  Edit2,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Dialog,
   DialogContent,
@@ -71,12 +74,17 @@ interface Document {
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getPatientById } = usePatients();
+  const { getPatientById, updatePatient } = usePatients();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   
   const patient = getPatientById(Number(id));
+
+  const [isEditingAllergies, setIsEditingAllergies] = useState(false);
+  const [isEditingMeds, setIsEditingMeds] = useState(false);
+  const [tempAllergies, setTempAllergies] = useState("");
+  const [tempMeds, setTempMeds] = useState("");
 
   const [documents, setDocuments] = useState<Document[]>([
     { 
@@ -109,6 +117,20 @@ const PatientDetail = () => {
       </Layout>
     );
   }
+
+  const handleSaveAllergies = () => {
+    const newList = tempAllergies.split(',').map(s => s.trim()).filter(s => s !== "");
+    updatePatient(patient.id, { allergies: newList });
+    setIsEditingAllergies(false);
+    showSuccess("Alergias atualizadas!");
+  };
+
+  const handleSaveMeds = () => {
+    const newList = tempMeds.split(',').map(s => s.trim()).filter(s => s !== "");
+    updatePatient(patient.id, { medications: newList });
+    setIsEditingMeds(false);
+    showSuccess("Medicamentos atualizados!");
+  };
 
   const handleExportPDF = async () => {
     setIsExporting(true);
@@ -205,36 +227,98 @@ const PatientDetail = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="space-y-6">
-            <Card className="border-none shadow-sm bg-red-50 border-l-4 border-l-red-500">
-              <CardHeader className="pb-2">
+            <Card className="border-none shadow-sm bg-red-50 border-l-4 border-l-red-500 relative group">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-xs font-bold flex items-center gap-2 text-red-700 uppercase tracking-wider">
                   <AlertTriangle size={14} />
                   ALERGIAS
                 </CardTitle>
+                {!isEditingAllergies ? (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => {
+                      setTempAllergies(patient.allergies?.join(', ') || "");
+                      setIsEditingAllergies(true);
+                    }}
+                  >
+                    <Edit2 size={12} />
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 rounded-full text-green-600"
+                    onClick={handleSaveAllergies}
+                  >
+                    <Check size={12} />
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {patient.allergies?.length ? patient.allergies.map((allergy, i) => (
-                    <Badge key={i} variant="destructive" className="rounded-lg text-[10px]">{allergy}</Badge>
-                  )) : <span className="text-xs text-muted-foreground">Nenhuma alergia registrada</span>}
-                </div>
+                {isEditingAllergies ? (
+                  <Textarea 
+                    className="text-xs min-h-[60px] bg-white border-red-200"
+                    value={tempAllergies}
+                    onChange={(e) => setTempAllergies(e.target.value)}
+                    autoFocus
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {patient.allergies?.length ? patient.allergies.map((allergy, i) => (
+                      <Badge key={i} variant="destructive" className="rounded-lg text-[10px]">{allergy}</Badge>
+                    )) : <span className="text-xs text-muted-foreground">Nenhuma alergia registrada</span>}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-sm">
-              <CardHeader className="pb-2">
+            <Card className="border-none shadow-sm relative group">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <CardTitle className="text-xs font-bold flex items-center gap-2 text-[#2d3154] uppercase tracking-wider">
                   <Pill size={14} className="text-accent" />
                   MEDICAMENTOS ATIVOS
                 </CardTitle>
+                {!isEditingMeds ? (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => {
+                      setTempMeds(patient.medications?.join(', ') || "");
+                      setIsEditingMeds(true);
+                    }}
+                  >
+                    <Edit2 size={12} />
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 rounded-full text-green-600"
+                    onClick={handleSaveMeds}
+                  >
+                    <Check size={12} />
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="space-y-2">
-                {patient.medications?.length ? patient.medications.map((med, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-xl text-xs font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                    {med}
-                  </div>
-                )) : <span className="text-xs text-muted-foreground">Nenhum medicamento registrado</span>}
+                {isEditingMeds ? (
+                  <Textarea 
+                    className="text-xs min-h-[80px] bg-gray-50"
+                    value={tempMeds}
+                    onChange={(e) => setTempMeds(e.target.value)}
+                    autoFocus
+                  />
+                ) : (
+                  patient.medications?.length ? patient.medications.map((med, i) => (
+                    <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-xl text-xs font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                      {med}
+                    </div>
+                  )) : <span className="text-xs text-muted-foreground">Nenhum medicamento registrado</span>
+                )}
               </CardContent>
             </Card>
 

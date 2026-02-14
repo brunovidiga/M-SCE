@@ -19,6 +19,7 @@ export interface Patient {
 interface PatientContextType {
   patients: Patient[];
   addPatient: (patient: Patient) => void;
+  updatePatient: (id: number, data: Partial<Patient>) => void;
   deletePatient: (id: number) => void;
   getPatientById: (id: number) => Patient | undefined;
 }
@@ -47,6 +48,10 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setPatients(prev => [patient, ...prev]);
   };
 
+  const updatePatient = (id: number, data: Partial<Patient>) => {
+    setPatients(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
+  };
+
   const deletePatient = (id: number) => {
     setPatients(prev => prev.filter(p => p.id !== id));
   };
@@ -56,7 +61,7 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <PatientContext.Provider value={{ patients, addPatient, deletePatient, getPatientById }}>
+    <PatientContext.Provider value={{ patients, addPatient, updatePatient, deletePatient, getPatientById }}>
       {children}
     </PatientContext.Provider>
   );
