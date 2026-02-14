@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "next-themes";
 import Dashboard from "./pages/Dashboard";
 import NewConsultation from "./pages/NewConsultation";
 import History from "./pages/History";
@@ -19,35 +18,35 @@ import Calculators from "./pages/Calculators";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import ClinicalCopilot from "./components/ClinicalCopilot";
+import CommandMenu from "./components/CommandMenu";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/" element={<Layout><Dashboard /></Layout>} />
-            <Route path="/agenda" element={<Agenda />} />
-            <Route path="/telemedicina" element={<Telemedicine />} />
-            <Route path="/nova-consulta" element={<NewConsultation />} />
-            <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
-            <Route path="/pacientes/:id" element={<PatientDetail />} />
-            <Route path="/historico" element={<Layout><History /></Layout>} />
-            <Route path="/calculadoras" element={<Calculators />} />
-            <Route path="/relatorios" element={<Reports />} />
-            <Route path="/configuracoes" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <ClinicalCopilot />
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <CommandMenu />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/" element={<Layout><Dashboard /></Layout>} />
+          <Route path="/agenda" element={<Agenda />} />
+          <Route path="/telemedicina" element={<Telemedicine />} />
+          <Route path="/nova-consulta" element={<NewConsultation />} />
+          <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
+          <Route path="/pacientes/:id" element={<PatientDetail />} />
+          <Route path="/historico" element={<Layout><History /></Layout>} />
+          <Route path="/calculadoras" element={<Calculators />} />
+          <Route path="/relatorios" element={<Reports />} />
+          <Route path="/configuracoes" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <ClinicalCopilot />
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
