@@ -10,7 +10,8 @@ import {
   Mail,
   Calendar,
   ArrowRight,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,25 +22,45 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Layout from '@/components/Layout';
 import NewPatientDialog from '@/components/NewPatientDialog';
+import { showSuccess } from '@/utils/toast';
 
 const Patients = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [patientToDelete, setPatientToDelete] = useState<any>(null);
   const navigate = useNavigate();
 
-  const patients = [
+  const [patients, setPatients] = useState([
     { id: 1, name: "Maria Oliveira", cpf: "123.456.789-00", lastVisit: "24/05/2024", phone: "(11) 98765-4321" },
     { id: 2, name: "João Santos", cpf: "234.567.890-11", lastVisit: "24/05/2024", phone: "(11) 91234-5678" },
     { id: 3, name: "Ana Costa", cpf: "345.678.901-22", lastVisit: "23/05/2024", phone: "(11) 97654-3210" },
     { id: 4, name: "Pedro Rocha", cpf: "456.789.012-33", lastVisit: "22/05/2024", phone: "(11) 98888-7777" },
     { id: 5, name: "Carla Mendes", cpf: "567.890.123-44", lastVisit: "21/05/2024", phone: "(11) 99999-0000" },
-  ];
+  ]);
 
   const filteredPatients = patients.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.cpf.includes(searchTerm)
   );
+
+  const handleDeleteConfirm = () => {
+    if (patientToDelete) {
+      setPatients(patients.filter(p => p.id !== patientToDelete.id));
+      showSuccess(`Paciente ${patientToDelete.name} excluído com sucesso.`);
+      setPatientToDelete(null);
+    }
+  };
 
   return (
     <Layout>
@@ -91,7 +112,13 @@ const Patients = () => {
                       <DropdownMenuContent align="end" className="rounded-xl">
                         <DropdownMenuItem onClick={() => navigate(`/pacientes/${patient.id}`)}>Ver Prontuário</DropdownMenuItem>
                         <DropdownMenuItem>Editar Cadastro</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-500">Excluir</DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-red-500 focus:text-red-500 focus:bg-red-50"
+                          onClick={() => setPatientToDelete(patient)}
+                        >
+                          <Trash2 size={14} className="mr-2" />
+                          Excluir
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -134,6 +161,26 @@ const Patients = () => {
           ))}
         </div>
       </div>
+
+      <AlertDialog open={!!patientToDelete} onOpenChange={(open) => !open && setPatientToDelete(null)}>
+        <AlertDialogContent className="rounded-3xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold text-[#2d3154]">Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o paciente <strong>{patientToDelete?.name}</strong>? Esta ação não pode ser desfeita e todos os dados do prontuário serão removidos.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-500 hover:bg-red-600 text-white rounded-xl"
+              onClick={handleDeleteConfirm}
+            >
+              Confirmar Exclusão
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 };
