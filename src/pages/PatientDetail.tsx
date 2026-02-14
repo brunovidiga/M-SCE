@@ -19,12 +19,20 @@ import {
   UserPlus,
   Mic,
   FileDown,
-  Upload
+  Upload,
+  X,
+  Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   LineChart, 
   Line, 
@@ -63,11 +71,12 @@ const PatientDetail = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   
   const [documents, setDocuments] = useState<Document[]>([
-    { id: 1, name: "Hemograma Completo.pdf", date: "20/05/2024", type: "Laboratório", size: "1.2 MB" },
-    { id: 2, name: "Raio-X Tórax.jpg", date: "15/04/2024", type: "Imagem", size: "4.5 MB" },
-    { id: 3, name: "Eletrocardiograma.pdf", date: "10/03/2024", type: "Cardiologia", size: "850 KB" },
+    { id: 1, name: "Hemograma Completo.pdf", date: "20/05/2024", type: "Laboratório", size: "1.2 MB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+    { id: 2, name: "Raio-X Tórax.jpg", date: "15/04/2024", type: "Imagem", size: "4.5 MB", url: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800" },
+    { id: 3, name: "Eletrocardiograma.pdf", date: "10/03/2024", type: "Cardiologia", size: "850 KB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
   ]);
 
   const patient = {
@@ -318,7 +327,11 @@ const PatientDetail = () => {
               <TabsContent value="documents" className="pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {documents.map((doc) => (
-                    <Card key={doc.id} className="border-none shadow-sm hover:shadow-md transition-all group">
+                    <Card 
+                      key={doc.id} 
+                      className="border-none shadow-sm hover:shadow-md transition-all group cursor-pointer"
+                      onClick={() => setSelectedDoc(doc)}
+                    >
                       <CardContent className="p-4 flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                           {doc.type === "Imagem" ? <ImageIcon size={24} /> : <FileSearch size={24} />}
@@ -327,14 +340,30 @@ const PatientDetail = () => {
                           <p className="font-bold text-sm text-[#2d3154] truncate">{doc.name}</p>
                           <p className="text-[10px] text-muted-foreground">{doc.date} • {doc.type} • {doc.size}</p>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="rounded-full hover:bg-primary/10 text-primary-foreground"
-                          onClick={() => handleDownload(doc)}
-                        >
-                          <Download size={18} />
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="rounded-full hover:bg-primary/10 text-primary-foreground"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedDoc(doc);
+                            }}
+                          >
+                            <Eye size={18} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="rounded-full hover:bg-primary/10 text-primary-foreground"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownload(doc);
+                            }}
+                          >
+                            <Download size={18} />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -351,6 +380,51 @@ const PatientDetail = () => {
             </Tabs>
           </div>
         </div>
+
+        {/* Document Preview Dialog */}
+        <Dialog open={!!selectedDoc} onOpenChange={(open) => !open && setSelectedDoc(null)}>
+          <DialogContent className="sm:max-w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-3xl border-none">
+            <DialogHeader className="p-6 bg-white border-b flex flex-row items-center justify-between space-y-0">
+              <DialogTitle className="text-xl font-bold text-[#2d3154] flex items-center gap-2">
+                {selectedDoc?.type === "Imagem" ? <ImageIcon className="text-accent" /> : <FileSearch className="text-accent" />}
+                {selectedDoc?.name}
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-xl gap-2"
+                  onClick={() => selectedDoc && handleDownload(selectedDoc)}
+                >
+                  <Download size={16} />
+                  Baixar
+                </Button>
+              </div>
+            </DialogHeader>
+            <div className="flex-1 bg-gray-100 flex items-center justify-center p-4 min-h-[60vh] overflow-auto">
+              {selectedDoc?.url ? (
+                selectedDoc.type === "Imagem" ? (
+                  <img 
+                    src={selectedDoc.url} 
+                    alt={selectedDoc.name} 
+                    className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                  />
+                ) : (
+                  <iframe 
+                    src={selectedDoc.url} 
+                    className="w-full h-[70vh] rounded-lg shadow-lg bg-white"
+                    title={selectedDoc.name}
+                  />
+                )
+              ) : (
+                <div className="text-center space-y-4 p-12">
+                  <FileSearch size={64} className="mx-auto text-gray-300" />
+                  <p className="text-muted-foreground">Visualização não disponível para este arquivo.</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
