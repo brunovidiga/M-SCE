@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -47,6 +47,7 @@ import ReferralDialog from '@/components/ReferralDialog';
 import ConsultationRecording from '@/components/ConsultationRecording';
 import MedicalReportTemplate from '@/components/MedicalReportTemplate';
 import { exportPatientToPDF } from '@/utils/exportUtils';
+import { usePatients } from '@/context/PatientContext';
 import { showSuccess, showError } from '@/utils/toast';
 
 const vitalData = [
@@ -70,10 +71,13 @@ interface Document {
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { getPatientById } = usePatients();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   
+  const patient = getPatientById(Number(id));
+
   const [documents, setDocuments] = useState<Document[]>([
     { 
       id: 1, 
@@ -93,31 +97,18 @@ const PatientDetail = () => {
       url: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800",
       fileType: "image/jpeg"
     },
-    { 
-      id: 3, 
-      name: "Eletrocardiograma.pdf", 
-      date: "10/03/2024", 
-      type: "Cardiologia", 
-      size: "850 KB", 
-      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-      fileType: "application/pdf"
-    },
   ]);
 
-  const patient = {
-    name: "Maria Oliveira",
-    age: "45 anos",
-    gender: "Feminino",
-    cpf: "123.456.789-00",
-    bloodType: "O+",
-    allergies: ["Dipirona", "Penicilina"],
-    medications: ["Losartana 50mg", "Metformina 850mg"],
-    history: [
-      { id: 1, date: "24/05/2024", type: "Consulta de Rotina", summary: "Paciente estável, pressão controlada.", doctor: "Dr. Ricardo Silva" },
-      { id: 2, date: "12/02/2024", type: "Retorno", summary: "Ajuste de dosagem de Losartana.", doctor: "Dr. Ricardo Silva" },
-      { id: 3, date: "15/11/2023", type: "Emergência", summary: "Crise hipertensiva leve.", doctor: "Dra. Ana Paula" },
-    ]
-  };
+  if (!patient) {
+    return (
+      <Layout>
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-bold text-[#2d3154]">Paciente não encontrado</h2>
+          <Button onClick={() => navigate('/pacientes')} className="mt-4">Voltar para lista</Button>
+        </div>
+      </Layout>
+    );
+  }
 
   const handleExportPDF = async () => {
     setIsExporting(true);
@@ -132,12 +123,7 @@ const PatientDetail = () => {
   };
 
   const handleDownload = (doc: Document) => {
-    if (!doc.url) {
-      showError("Arquivo não disponível para download.");
-      return;
-    }
-
-    // Create a temporary anchor element to trigger the native download dialog
+    if (!doc.url) return;
     const link = document.createElement('a');
     link.href = doc.url;
     link.setAttribute('download', doc.name);
@@ -145,7 +131,6 @@ const PatientDetail = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     showSuccess(`Download iniciado: ${doc.name}`);
   };
 
@@ -156,7 +141,6 @@ const PatientDetail = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Create a blob URL that persists for the session
       const fileUrl = URL.createObjectURL(file);
       const newDoc: Document = {
         id: Date.now(),
@@ -184,7 +168,7 @@ const PatientDetail = () => {
           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
         />
 
-        <MedicalReportTemplate id="medical-report-template" patient={{...patient, medications: patient.medications}} />
+        <MedicalReportTemplate id="medical-report-template" patient={{...patient, medications: patient.medications || []}} />
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -193,7 +177,7 @@ const PatientDetail = () => {
             </Button>
             <div>
               <h2 className="text-2xl font-bold text-[#2d3154]">{patient.name}</h2>
-              <p className="text-sm text-muted-foreground">{patient.age} • {patient.gender} • CPF: {patient.cpf}</p>
+              <p className="text-sm text-muted-foreground">{patient.birth ? `${patient.birth} • ` : ''}{patient.gender || 'Gênero não informado'} • CPF: {patient.cpf}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -230,9 +214,9 @@ const PatientDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {patient.allergies.map((allergy, i) => (
+                  {patient.allergies?.length ? patient.allergies.map((allergy, i) => (
                     <Badge key={i} variant="destructive" className="rounded-lg text-[10px]">{allergy}</Badge>
-                  ))}
+                  )) : <span className="text-xs text-muted-foreground">Nenhuma alergia registrada</span>}
                 </div>
               </CardContent>
             </Card>
@@ -245,12 +229,12 @@ const PatientDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {patient.medications.map((med, i) => (
+                {patient.medications?.length ? patient.medications.map((med, i) => (
                   <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-xl text-xs font-medium">
                     <div className="w-1.5 h-1.5 rounded-full bg-accent" />
                     {med}
                   </div>
-                ))}
+                )) : <span className="text-xs text-muted-foreground">Nenhum medicamento registrado</span>}
               </CardContent>
             </Card>
 
@@ -269,10 +253,6 @@ const PatientDetail = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-muted-foreground">Glicemia</span>
                   <span className="text-sm font-bold">95 mg/dL</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">Peso</span>
-                  <span className="text-sm font-bold">68 kg</span>
                 </div>
               </CardContent>
             </Card>
@@ -297,10 +277,6 @@ const PatientDetail = () => {
                       <TrendingUp size={20} className="text-accent" />
                       Evolução Clínica
                     </CardTitle>
-                    <div className="flex gap-2">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100">P.A. Sistólica</Badge>
-                      <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-100">Glicemia</Badge>
-                    </div>
                   </CardHeader>
                   <CardContent className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -329,28 +305,8 @@ const PatientDetail = () => {
                       Histórico de Consultas
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6 relative before:absolute before:left-[31px] before:top-8 before:bottom-8 before:w-0.5 before:bg-gray-100">
-                    {patient.history.map((item) => (
-                      <div key={item.id} className="relative pl-12 group">
-                        <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-white border-2 border-primary/20 flex items-center justify-center z-10 group-hover:border-primary transition-colors">
-                          <div className="w-2 h-2 rounded-full bg-primary" />
-                        </div>
-                        <div className="p-4 rounded-2xl border border-gray-100 hover:border-primary/30 transition-all hover:shadow-sm cursor-pointer bg-white">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="font-bold text-[#2d3154]">{item.type}</p>
-                              <p className="text-xs text-muted-foreground">{item.date} • {item.doctor}</p>
-                            </div>
-                            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
-                              <MoreHorizontal size={16} />
-                            </Button>
-                          </div>
-                          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-2 italic">
-                            "{item.summary}"
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    Nenhuma consulta anterior registrada para este paciente.
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -372,26 +328,10 @@ const PatientDetail = () => {
                           <p className="text-[10px] text-muted-foreground">{doc.date} • {doc.type} • {doc.size}</p>
                         </div>
                         <div className="flex gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="rounded-full hover:bg-primary/10 text-primary-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedDoc(doc);
-                            }}
-                          >
+                          <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 text-primary-foreground" onClick={(e) => { e.stopPropagation(); setSelectedDoc(doc); }}>
                             <Eye size={18} />
                           </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="rounded-full hover:bg-primary/10 text-primary-foreground"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDownload(doc);
-                            }}
-                          >
+                          <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 text-primary-foreground" onClick={(e) => { e.stopPropagation(); handleDownload(doc); }}>
                             <Download size={18} />
                           </Button>
                         </div>
@@ -412,7 +352,6 @@ const PatientDetail = () => {
           </div>
         </div>
 
-        {/* Document Preview Dialog */}
         <Dialog open={!!selectedDoc} onOpenChange={(open) => !open && setSelectedDoc(null)}>
           <DialogContent className="sm:max-w-[90vw] max-h-[90vh] p-0 overflow-hidden rounded-3xl border-none">
             <DialogHeader className="p-6 bg-white border-b flex flex-row items-center justify-between space-y-0">
@@ -420,38 +359,18 @@ const PatientDetail = () => {
                 {selectedDoc?.type === "Imagem" ? <ImageIcon className="text-accent" /> : <FileSearch className="text-accent" />}
                 {selectedDoc?.name}
               </DialogTitle>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="rounded-xl gap-2"
-                  onClick={() => selectedDoc && handleDownload(selectedDoc)}
-                >
-                  <Download size={16} />
-                  Baixar
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" className="rounded-xl gap-2" onClick={() => selectedDoc && handleDownload(selectedDoc)}>
+                <Download size={16} />
+                Baixar
+              </Button>
             </DialogHeader>
             <div className="flex-1 bg-gray-100 flex items-center justify-center p-4 min-h-[60vh] overflow-auto">
-              {selectedDoc?.url ? (
+              {selectedDoc?.url && (
                 selectedDoc.fileType?.includes('pdf') ? (
-                  <embed 
-                    src={selectedDoc.url} 
-                    type="application/pdf" 
-                    className="w-full h-[75vh] rounded-lg shadow-lg bg-white"
-                  />
+                  <embed src={selectedDoc.url} type="application/pdf" className="w-full h-[75vh] rounded-lg shadow-lg bg-white" />
                 ) : (
-                  <img 
-                    src={selectedDoc.url} 
-                    alt={selectedDoc.name} 
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
-                  />
+                  <img src={selectedDoc.url} alt={selectedDoc.name} className="max-w-full max-h-full object-contain rounded-lg shadow-lg" />
                 )
-              ) : (
-                <div className="text-center space-y-4 p-12">
-                  <FileSearch size={64} className="mx-auto text-gray-300" />
-                  <p className="text-muted-foreground">Visualização não disponível para este arquivo.</p>
-                </div>
               )}
             </div>
           </DialogContent>

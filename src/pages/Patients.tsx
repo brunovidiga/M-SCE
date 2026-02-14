@@ -34,33 +34,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import Layout from '@/components/Layout';
 import NewPatientDialog from '@/components/NewPatientDialog';
+import { usePatients } from '@/context/PatientContext';
 import { showSuccess } from '@/utils/toast';
 
 const Patients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [patientToDelete, setPatientToDelete] = useState<any>(null);
   const navigate = useNavigate();
-
-  const [patients, setPatients] = useState([
-    { id: 1, name: "Maria Oliveira", cpf: "123.456.789-00", lastVisit: "24/05/2024", phone: "(11) 98765-4321" },
-    { id: 2, name: "João Santos", cpf: "234.567.890-11", lastVisit: "24/05/2024", phone: "(11) 91234-5678" },
-    { id: 3, name: "Ana Costa", cpf: "345.678.901-22", lastVisit: "23/05/2024", phone: "(11) 97654-3210" },
-    { id: 4, name: "Pedro Rocha", cpf: "456.789.012-33", lastVisit: "22/05/2024", phone: "(11) 98888-7777" },
-    { id: 5, name: "Carla Mendes", cpf: "567.890.123-44", lastVisit: "21/05/2024", phone: "(11) 99999-0000" },
-  ]);
+  const { patients, addPatient, deletePatient } = usePatients();
 
   const filteredPatients = patients.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.cpf.includes(searchTerm)
   );
 
-  const handleAddPatient = (newPatient: any) => {
-    setPatients([newPatient, ...patients]);
-  };
-
   const handleDeleteConfirm = () => {
     if (patientToDelete) {
-      setPatients(patients.filter(p => p.id !== patientToDelete.id));
+      deletePatient(patientToDelete.id);
       showSuccess(`Paciente ${patientToDelete.name} excluído com sucesso.`);
       setPatientToDelete(null);
     }
@@ -74,7 +64,7 @@ const Patients = () => {
             <h2 className="text-3xl font-bold text-[#2d3154]">Pacientes</h2>
             <p className="text-muted-foreground">Gerencie o cadastro e histórico de seus pacientes.</p>
           </div>
-          <NewPatientDialog onSave={handleAddPatient}>
+          <NewPatientDialog onSave={addPatient}>
             <Button className="btn-accent gap-2 rounded-xl h-12 shadow-lg shadow-orange-100">
               <UserPlus size={20} />
               Novo Paciente
