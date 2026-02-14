@@ -54,6 +54,10 @@ const Patients = () => {
     p.cpf.includes(searchTerm)
   );
 
+  const handleAddPatient = (newPatient: any) => {
+    setPatients([newPatient, ...patients]);
+  };
+
   const handleDeleteConfirm = () => {
     if (patientToDelete) {
       setPatients(patients.filter(p => p.id !== patientToDelete.id));
@@ -70,7 +74,7 @@ const Patients = () => {
             <h2 className="text-3xl font-bold text-[#2d3154]">Pacientes</h2>
             <p className="text-muted-foreground">Gerencie o cadastro e histórico de seus pacientes.</p>
           </div>
-          <NewPatientDialog>
+          <NewPatientDialog onSave={handleAddPatient}>
             <Button className="btn-accent gap-2 rounded-xl h-12 shadow-lg shadow-orange-100">
               <UserPlus size={20} />
               Novo Paciente
