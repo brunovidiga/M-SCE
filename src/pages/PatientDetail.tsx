@@ -15,7 +15,7 @@ import {
   TrendingUp,
   Clock,
   FileSearch,
-  Image as ImageIcon,
+  ImageIcon,
   UserPlus,
   Mic,
   FileDown,
@@ -49,13 +49,22 @@ const vitalData = [
   { date: '24/05', pa: 122, glicemia: 95 },
 ];
 
+interface Document {
+  id: number;
+  name: string;
+  date: string;
+  type: string;
+  size: string;
+  url?: string;
+}
+
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   
-  const [documents, setDocuments] = useState([
+  const [documents, setDocuments] = useState<Document[]>([
     { id: 1, name: "Hemograma Completo.pdf", date: "20/05/2024", type: "Laboratório", size: "1.2 MB" },
     { id: 2, name: "Raio-X Tórax.jpg", date: "15/04/2024", type: "Imagem", size: "4.5 MB" },
     { id: 3, name: "Eletrocardiograma.pdf", date: "10/03/2024", type: "Cardiologia", size: "850 KB" },
@@ -88,9 +97,18 @@ const PatientDetail = () => {
     }
   };
 
-  const handleDownload = (docName: string) => {
-    showSuccess(`Iniciando download de: ${docName}`);
-    // In a real app, this would trigger a file download from a URL
+  const handleDownload = (doc: Document) => {
+    if (doc.url) {
+      const link = document.createElement('a');
+      link.href = doc.url;
+      link.download = doc.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showSuccess(`Download concluído: ${doc.name}`);
+    } else {
+      showSuccess(`Iniciando download simulado de: ${doc.name}`);
+    }
   };
 
   const handleUploadClick = () => {
@@ -100,12 +118,14 @@ const PatientDetail = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const newDoc = {
+      const fileUrl = URL.createObjectURL(file);
+      const newDoc: Document = {
         id: Date.now(),
         name: file.name,
         date: new Date().toLocaleDateString('pt-BR'),
         type: file.type.includes('image') ? "Imagem" : "Documento",
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        url: fileUrl
       };
       setDocuments([newDoc, ...documents]);
       showSuccess("Exame enviado com sucesso!");
@@ -124,7 +144,6 @@ const PatientDetail = () => {
           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
         />
 
-        {/* Hidden Template for PDF Generation */}
         <MedicalReportTemplate id="medical-report-template" patient={{...patient, medications: patient.medications}} />
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -161,7 +180,6 @@ const PatientDetail = () => {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar de Informações Rápidas */}
           <div className="space-y-6">
             <Card className="border-none shadow-sm bg-red-50 border-l-4 border-l-red-500">
               <CardHeader className="pb-2">
@@ -220,7 +238,6 @@ const PatientDetail = () => {
             </Card>
           </div>
 
-          {/* Conteúdo Principal com Abas */}
           <div className="lg:col-span-3 space-y-6">
             <Tabs defaultValue="evolution" className="w-full">
               <TabsList className="grid w-full grid-cols-4 rounded-2xl bg-white/50 backdrop-blur-md p-1 shadow-sm">
@@ -314,7 +331,7 @@ const PatientDetail = () => {
                           variant="ghost" 
                           size="icon" 
                           className="rounded-full hover:bg-primary/10 text-primary-foreground"
-                          onClick={() => handleDownload(doc.name)}
+                          onClick={() => handleDownload(doc)}
                         >
                           <Download size={18} />
                         </Button>
