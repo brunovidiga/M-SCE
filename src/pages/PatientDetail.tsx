@@ -17,7 +17,8 @@ import {
   FileSearch,
   Image as ImageIcon,
   UserPlus,
-  Mic
+  Mic,
+  FileDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,9 @@ import {
 import Layout from '@/components/Layout';
 import ReferralDialog from '@/components/ReferralDialog';
 import ConsultationRecording from '@/components/ConsultationRecording';
+import MedicalReportTemplate from '@/components/MedicalReportTemplate';
+import { exportPatientToPDF } from '@/utils/exportUtils';
+import { showSuccess, showError } from '@/utils/toast';
 
 const vitalData = [
   { date: '01/01', pa: 130, glicemia: 110 },
@@ -47,6 +51,7 @@ const vitalData = [
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isExporting, setIsExporting] = useState(false);
 
   const patient = {
     name: "Maria Oliveira",
@@ -68,9 +73,24 @@ const PatientDetail = () => {
     ]
   };
 
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      await exportPatientToPDF('medical-report-template', `Relatorio_${patient.name.replace(' ', '_')}`);
+      showSuccess("Relatório PDF gerado com sucesso!");
+    } catch (error) {
+      showError("Erro ao gerar PDF. Tente novamente.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
+        {/* Hidden Template for PDF Generation */}
+        <MedicalReportTemplate id="medical-report-template" patient={patient} />
+
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate('/pacientes')} className="rounded-full">
@@ -88,9 +108,14 @@ const PatientDetail = () => {
                 Encaminhar
               </Button>
             </ReferralDialog>
-            <Button variant="outline" className="rounded-xl gap-2 bg-white dark:bg-card border-none shadow-sm">
-              <Download size={18} />
-              Exportar
+            <Button 
+              variant="outline" 
+              className="rounded-xl gap-2 bg-white dark:bg-card border-none shadow-sm"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+            >
+              <FileDown size={18} className={isExporting ? "animate-bounce" : ""} />
+              {isExporting ? "Gerando..." : "Exportar PDF"}
             </Button>
             <Button className="btn-accent rounded-xl gap-2 shadow-lg shadow-orange-100" onClick={() => navigate('/nova-consulta')}>
               <Plus size={18} />
