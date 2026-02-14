@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   TrendingUp, 
   Users, 
@@ -29,6 +29,8 @@ import {
   Line
 } from 'recharts';
 import Layout from '@/components/Layout';
+import { exportPatientToPDF } from '@/utils/exportUtils';
+import { showSuccess, showError } from '@/utils/toast';
 
 const diagnosisData = [
   { name: 'Enxaqueca', value: 35 },
@@ -49,9 +51,25 @@ const productivityData = [
 ];
 
 const Reports = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      // We target the main content area for export
+      await exportPatientToPDF('reports-content', 'Relatorio_Desempenho_Clinico');
+      showSuccess("Relatório de desempenho exportado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      showError("Erro ao exportar o relatório. Tente novamente.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <Layout>
-      <div className="space-y-8">
+      <div className="space-y-8" id="reports-content">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold text-[#2d3154]">Relatórios e Insights</h2>
@@ -62,9 +80,13 @@ const Reports = () => {
               <Calendar size={18} />
               Últimos 30 dias
             </Button>
-            <Button className="btn-accent gap-2 rounded-xl shadow-lg shadow-orange-200">
-              <Download size={18} />
-              Exportar PDF
+            <Button 
+              className="btn-accent gap-2 rounded-xl shadow-lg shadow-orange-200"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+            >
+              <Download size={18} className={isExporting ? "animate-bounce" : ""} />
+              {isExporting ? "Exportando..." : "Exportar PDF"}
             </Button>
           </div>
         </header>
