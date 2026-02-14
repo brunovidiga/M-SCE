@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -18,12 +18,22 @@ import {
   Search,
   Bell,
   Video,
-  Calculator
+  Calculator,
+  User,
+  ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+
+const patients = [
+  { id: 1, name: "Maria Oliveira", cpf: "123.456.789-00" },
+  { id: 2, name: "João Santos", cpf: "234.567.890-11" },
+  { id: 3, name: "Ana Costa", cpf: "345.678.901-22" },
+  { id: 4, name: "Pedro Rocha", cpf: "456.789.012-33" },
+  { id: 5, name: "Carla Mendes", cpf: "567.890.123-44" },
+];
 
 const SidebarItem = ({ icon: Icon, label, href, active, onClick }: { icon: any, label: string, href: string, active: boolean, onClick?: () => void }) => (
   <Link
@@ -95,7 +105,42 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof patients>([]);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      const filtered = patients.filter(p => 
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        p.cpf.includes(searchQuery)
+      );
+      setSearchResults(filtered);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectPatient = (id: number) => {
+    navigate(`/pacientes/${id}`);
+    setSearchQuery("");
+    setShowResults(false);
+  };
 
   return (
     <div className="flex min-h-screen bg-[#e8e5e9]">
@@ -121,12 +166,46 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               </Sheet>
             </div>
             
-            <div className="relative w-full hidden sm:block">
+            <div className="relative w-full hidden sm:block" ref={searchRef}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input 
                 placeholder="Busca global (Paciente, CPF, CID...)" 
                 className="pl-10 h-10 bg-gray-100/50 border-none rounded-xl focus-visible:ring-primary w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.length > 1 && setShowResults(true)}
               />
+              
+              {showResults && (
+                <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div className="p-2">
+                    {searchResults.length > 0 ? (
+                      searchResults.map((patient) => (
+                        <button
+                          key={patient.id}
+                          onClick={() => handleSelectPatient(patient.id)}
+                          className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary-foreground">
+                              <User size={16} />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-sm font-bold text-[#2d3154]">{patient.name}</p>
+                              <p className="text-[10px] text-muted-foreground">CPF: {patient.cpf}</p>
+                            </div>
+                          </div>
+                          <ArrowRight size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center">
+                        <p className="text-sm text-muted-foreground">Nenhum paciente encontrado.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
