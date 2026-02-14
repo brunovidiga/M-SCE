@@ -64,6 +64,7 @@ interface Document {
   type: string;
   size: string;
   url?: string;
+  fileType?: string;
 }
 
 const PatientDetail = () => {
@@ -74,9 +75,33 @@ const PatientDetail = () => {
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   
   const [documents, setDocuments] = useState<Document[]>([
-    { id: 1, name: "Hemograma Completo.pdf", date: "20/05/2024", type: "Laboratório", size: "1.2 MB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-    { id: 2, name: "Raio-X Tórax.jpg", date: "15/04/2024", type: "Imagem", size: "4.5 MB", url: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800" },
-    { id: 3, name: "Eletrocardiograma.pdf", date: "10/03/2024", type: "Cardiologia", size: "850 KB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+    { 
+      id: 1, 
+      name: "Hemograma Completo.pdf", 
+      date: "20/05/2024", 
+      type: "Laboratório", 
+      size: "1.2 MB", 
+      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      fileType: "application/pdf"
+    },
+    { 
+      id: 2, 
+      name: "Raio-X Tórax.jpg", 
+      date: "15/04/2024", 
+      type: "Imagem", 
+      size: "4.5 MB", 
+      url: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=800",
+      fileType: "image/jpeg"
+    },
+    { 
+      id: 3, 
+      name: "Eletrocardiograma.pdf", 
+      date: "10/03/2024", 
+      type: "Cardiologia", 
+      size: "850 KB", 
+      url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      fileType: "application/pdf"
+    },
   ]);
 
   const patient = {
@@ -107,17 +132,21 @@ const PatientDetail = () => {
   };
 
   const handleDownload = (doc: Document) => {
-    if (doc.url) {
-      const link = document.createElement('a');
-      link.href = doc.url;
-      link.download = doc.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showSuccess(`Download concluído: ${doc.name}`);
-    } else {
-      showSuccess(`Iniciando download simulado de: ${doc.name}`);
+    if (!doc.url) {
+      showError("Arquivo não disponível para download.");
+      return;
     }
+
+    // Create a temporary anchor element to trigger the native download dialog
+    const link = document.createElement('a');
+    link.href = doc.url;
+    link.setAttribute('download', doc.name);
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showSuccess(`Download iniciado: ${doc.name}`);
   };
 
   const handleUploadClick = () => {
@@ -127,6 +156,7 @@ const PatientDetail = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Create a blob URL that persists for the session
       const fileUrl = URL.createObjectURL(file);
       const newDoc: Document = {
         id: Date.now(),
@@ -134,7 +164,8 @@ const PatientDetail = () => {
         date: new Date().toLocaleDateString('pt-BR'),
         type: file.type.includes('image') ? "Imagem" : "Documento",
         size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        url: fileUrl
+        url: fileUrl,
+        fileType: file.type
       };
       setDocuments([newDoc, ...documents]);
       showSuccess("Exame enviado com sucesso!");
@@ -403,17 +434,17 @@ const PatientDetail = () => {
             </DialogHeader>
             <div className="flex-1 bg-gray-100 flex items-center justify-center p-4 min-h-[60vh] overflow-auto">
               {selectedDoc?.url ? (
-                selectedDoc.type === "Imagem" ? (
+                selectedDoc.fileType?.includes('pdf') ? (
+                  <embed 
+                    src={selectedDoc.url} 
+                    type="application/pdf" 
+                    className="w-full h-[75vh] rounded-lg shadow-lg bg-white"
+                  />
+                ) : (
                   <img 
                     src={selectedDoc.url} 
                     alt={selectedDoc.name} 
                     className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
-                  />
-                ) : (
-                  <iframe 
-                    src={selectedDoc.url} 
-                    className="w-full h-[70vh] rounded-lg shadow-lg bg-white"
-                    title={selectedDoc.name}
                   />
                 )
               ) : (
