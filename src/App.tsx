@@ -12,6 +12,8 @@ import PatientDetail from "./pages/PatientDetail";
 import Agenda from "./pages/Agenda";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
 import Telemedicine from "./pages/Telemedicine";
@@ -32,6 +34,8 @@ const App = () => (
           <CommandMenu />
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="/agenda" element={<Agenda />} />

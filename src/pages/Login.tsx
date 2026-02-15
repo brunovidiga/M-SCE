@@ -39,7 +39,7 @@ const Login = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Senha</Label>
-                  <a href="#" className="text-xs text-accent hover:underline">Esqueceu a senha?</a>
+                  <Link to="/forgot-password" size="sm" className="text-xs text-accent hover:underline">Esqueceu a senha?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
@@ -72,7 +72,7 @@ const Login = () => {
         </Card>
 
         <p className="text-center text-sm text-muted-foreground">
-          Não tem uma conta? <a href="#" className="text-accent font-semibold hover:underline">Solicite acesso</a>
+          Não tem uma conta? <Link to="/register" className="text-accent font-semibold hover:underline">Cadastre-se agora</Link>
         </p>
       </div>
     </div>
