@@ -17,7 +17,6 @@ import Settings from "./pages/Settings";
 import Telemedicine from "./pages/Telemedicine";
 import Calculators from "./pages/Calculators";
 import NotFound from "./pages/NotFound";
-import Layout from "./components/Layout";
 import ClinicalCopilot from "./components/ClinicalCopilot";
 import CommandMenu from "./components/CommandMenu";
 
@@ -34,13 +33,13 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/telemedicina" element={<Telemedicine />} />
             <Route path="/nova-consulta" element={<NewConsultation />} />
-            <Route path="/pacientes" element={<Layout><Patients /></Layout>} />
+            <Route path="/pacientes" element={<Patients />} />
             <Route path="/pacientes/:id" element={<PatientDetail />} />
-            <Route path="/historico" element={<Layout><History /></Layout>} />
+            <Route path="/historico" element={<History />} />
             <Route path="/calculadoras" element={<Calculators />} />
             <Route path="/relatorios" element={<Reports />} />
             <Route path="/configuracoes" element={<Settings />} />
