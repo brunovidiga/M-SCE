@@ -23,7 +23,8 @@ import {
   Edit2,
   Check,
   MessageCircle,
-  Printer
+  Printer,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -75,7 +76,7 @@ interface Document {
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getPatientById, updatePatient, addPrescription } = usePatients();
+  const { getPatientById, updatePatient, addPrescription, updatePrescription, deletePrescription } = usePatients();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
@@ -140,6 +141,17 @@ const PatientDetail = () => {
       medications: meds
     };
     addPrescription(patient.id, newPrescription);
+  };
+
+  const handleUpdatePrescription = (prescriptionId: number, meds: { name: string; instructions: string }[]) => {
+    updatePrescription(patient.id, prescriptionId, meds);
+  };
+
+  const handleDeletePrescription = (prescriptionId: number) => {
+    if (confirm("Tem certeza que deseja excluir esta receita?")) {
+      deletePrescription(patient.id, prescriptionId);
+      showSuccess("Receita excluída com sucesso.");
+    }
   };
 
   const handleExportPDF = async () => {
@@ -422,6 +434,18 @@ const PatientDetail = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
+                          <PrescriptionDialog 
+                            patientName={patient.name} 
+                            patientPhone={patient.phone}
+                            initialMeds={presc.medications}
+                            onSave={(meds) => handleUpdatePrescription(presc.id, meds)}
+                            title="Editar Receita"
+                          >
+                            <Button variant="ghost" size="icon" className="rounded-full text-primary-foreground hover:bg-primary/10">
+                              <Edit2 size={18} />
+                            </Button>
+                          </PrescriptionDialog>
+                          
                           <Button 
                             variant="ghost" 
                             size="icon" 
@@ -433,8 +457,14 @@ const PatientDetail = () => {
                           >
                             <MessageCircle size={18} />
                           </Button>
-                          <Button variant="ghost" size="icon" className="rounded-full">
-                            <Printer size={18} />
+                          
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="rounded-full text-red-500 hover:bg-red-50"
+                            onClick={() => handleDeletePrescription(presc.id)}
+                          >
+                            <Trash2 size={18} />
                           </Button>
                         </div>
                       </CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Pill, 
   Download, 
@@ -25,18 +25,35 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showSuccess } from '@/utils/toast';
 
+interface Medication {
+  id?: number;
+  name: string;
+  instructions: string;
+}
+
 interface PrescriptionDialogProps {
   children: React.ReactNode;
   patientName: string;
   patientPhone?: string;
+  initialMeds?: Medication[];
   onSave?: (meds: { name: string; instructions: string }[]) => void;
+  title?: string;
 }
 
-const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: PrescriptionDialogProps) => {
+const PrescriptionDialog = ({ children, patientName, patientPhone, initialMeds, onSave, title = "Nova Prescrição" }: PrescriptionDialogProps) => {
   const [open, setOpen] = useState(false);
-  const [meds, setMeds] = useState([
-    { id: 1, name: "", instructions: "" }
-  ]);
+  const [meds, setMeds] = useState<Medication[]>([]);
+
+  // Inicializa os medicamentos quando o diálogo abre
+  useEffect(() => {
+    if (open) {
+      if (initialMeds && initialMeds.length > 0) {
+        setMeds(initialMeds.map((m, i) => ({ ...m, id: m.id || Date.now() + i })));
+      } else {
+        setMeds([{ id: Date.now(), name: "", instructions: "" }]);
+      }
+    }
+  }, [open, initialMeds]);
 
   const handleAddMed = () => {
     setMeds([...meds, { id: Date.now(), name: "", instructions: "" }]);
@@ -66,7 +83,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
     if (onSave) {
       onSave(meds.map(({ name, instructions }) => ({ name, instructions })));
     }
-    showSuccess("Prescrição salva no prontuário!");
+    showSuccess(initialMeds ? "Prescrição atualizada!" : "Prescrição salva!");
     setOpen(false);
   };
 
@@ -79,7 +96,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#2d3154] flex items-center gap-2">
             <Pill className="text-accent" />
-            Nova Prescrição
+            {title}
           </DialogTitle>
           <DialogDescription>
             Preencha os medicamentos para {patientName}.
@@ -95,7 +112,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
                     <Label className="text-[10px] font-bold uppercase text-muted-foreground">Medicamento {index + 1}</Label>
                     <Input 
                       value={med.name} 
-                      onChange={(e) => updateMed(med.id, 'name', e.target.value)}
+                      onChange={(e) => updateMed(med.id!, 'name', e.target.value)}
                       placeholder="Nome do medicamento e dosagem"
                       className="bg-white border-none shadow-sm rounded-xl h-10"
                     />
@@ -104,7 +121,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
                     <Label className="text-[10px] font-bold uppercase text-muted-foreground">Posologia / Instruções</Label>
                     <Input 
                       value={med.instructions} 
-                      onChange={(e) => updateMed(med.id, 'instructions', e.target.value)}
+                      onChange={(e) => updateMed(med.id!, 'instructions', e.target.value)}
                       placeholder="Ex: Tomar 1x ao dia por 7 dias"
                       className="bg-white border-none shadow-sm rounded-xl h-10"
                     />
@@ -115,7 +132,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
                     variant="ghost" 
                     size="icon" 
                     className="text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full ml-2"
-                    onClick={() => handleRemoveMed(med.id)}
+                    onClick={() => handleRemoveMed(med.id!)}
                   >
                     <Trash2 size={18} />
                   </Button>
@@ -147,7 +164,7 @@ const PrescriptionDialog = ({ children, patientName, patientPhone, onSave }: Pre
           </div>
           <Button className="btn-accent rounded-xl gap-2 flex-1" onClick={handleFinalize}>
             <Check size={18} />
-            Salvar Receita
+            {initialMeds ? "Atualizar Receita" : "Salvar Receita"}
           </Button>
         </DialogFooter>
       </DialogContent>

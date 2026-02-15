@@ -30,6 +30,8 @@ interface PatientContextType {
   deletePatient: (id: number) => void;
   getPatientById: (id: number) => Patient | undefined;
   addPrescription: (patientId: number, prescription: Prescription) => void;
+  updatePrescription: (patientId: number, prescriptionId: number, meds: { name: string; instructions: string }[]) => void;
+  deletePrescription: (patientId: number, prescriptionId: number) => void;
 }
 
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
@@ -67,7 +69,6 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return initialPatients;
   });
 
-  // Sincroniza com localStorage sempre que o estado mudar
   useEffect(() => {
     localStorage.setItem('msce_patients', JSON.stringify(patients));
   }, [patients]);
@@ -100,8 +101,43 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }));
   };
 
+  const updatePrescription = (patientId: number, prescriptionId: number, meds: { name: string; instructions: string }[]) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return {
+          ...p,
+          prescriptions: p.prescriptions?.map(pr => 
+            pr.id === prescriptionId ? { ...pr, medications: meds } : pr
+          )
+        };
+      }
+      return p;
+    }));
+  };
+
+  const deletePrescription = (patientId: number, prescriptionId: number) => {
+    setPatients(prev => prev.map(p => {
+      if (p.id === patientId) {
+        return {
+          ...p,
+          prescriptions: p.prescriptions?.filter(pr => pr.id !== prescriptionId)
+        };
+      }
+      return p;
+    }));
+  };
+
   return (
-    <PatientContext.Provider value={{ patients, addPatient, updatePatient, deletePatient, getPatientById, addPrescription }}>
+    <PatientContext.Provider value={{ 
+      patients, 
+      addPatient, 
+      updatePatient, 
+      deletePatient, 
+      getPatientById, 
+      addPrescription,
+      updatePrescription,
+      deletePrescription
+    }}>
       {children}
     </PatientContext.Provider>
   );
