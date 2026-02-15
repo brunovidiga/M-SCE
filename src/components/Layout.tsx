@@ -8,7 +8,6 @@ import {
   History, 
   Settings, 
   LogOut, 
-  Stethoscope,
   Menu,
   Users,
   Wifi,
@@ -57,12 +56,14 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-10 px-2">
-        <div className="flex items-center gap-3">
-          <div className="bg-[#fb9262] p-2 rounded-lg shadow-lg shadow-orange-200">
-            <Stethoscope className="text-white" size={24} />
-          </div>
-          <h1 className="font-bold text-xl tracking-tight text-[#2d3154]">M-SCE</h1>
-        </div>
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/logo.png" alt="M-SCE Logo" className="h-8 w-auto object-contain" onError={(e) => {
+            // Fallback caso a imagem não exista ainda
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }} />
+          <span className="hidden font-black text-2xl tracking-tighter text-[#4a4a4a]">M-SCE</span>
+        </Link>
         <div className={cn(
           "flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter",
           isOnline ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"

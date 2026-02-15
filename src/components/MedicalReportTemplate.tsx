@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Stethoscope, Calendar, User, FileText, Pill, Activity } from 'lucide-react';
+import { Calendar, User, FileText, Pill, Activity } from 'lucide-react';
 
 interface MedicalReportTemplateProps {
   id: string;
@@ -20,11 +20,9 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
       {/* Header */}
       <div className="flex justify-between items-start border-b-2 border-[#fb9262] pb-8 mb-8">
         <div className="flex items-center gap-4">
-          <div className="bg-[#fb9262] p-3 rounded-2xl">
-            <Stethoscope className="text-white" size={32} />
-          </div>
+          <img src="/logo.png" alt="M-SCE Logo" className="h-12 w-auto" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">M-SCE</h1>
+            <h1 className="text-3xl font-black tracking-tighter text-[#4a4a4a]">M-SCE</h1>
             <p className="text-sm text-muted-foreground uppercase tracking-widest">Medical Smart Clinical Explorer</p>
           </div>
         </div>
@@ -52,11 +50,11 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
           </div>
           <div>
             <p className="text-[10px] font-bold text-muted-foreground uppercase">Idade / Gênero</p>
-            <p className="font-semibold">{patient.age} • {patient.gender}</p>
+            <p className="font-semibold">{patient.age || 'N/A'} • {patient.gender || 'N/A'}</p>
           </div>
           <div>
             <p className="text-[10px] font-bold text-muted-foreground uppercase">Tipo Sanguíneo</p>
-            <p className="font-semibold">{patient.bloodType}</p>
+            <p className="font-semibold">{patient.bloodType || 'N/A'}</p>
           </div>
         </div>
       </div>
@@ -71,9 +69,7 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
           <div>
             <h3 className="text-sm font-bold text-muted-foreground mb-1">Resumo da Evolução</h3>
             <p className="leading-relaxed text-gray-700">
-              Paciente apresenta quadro estável com boa adesão ao tratamento proposto. 
-              Os registros de pressão arterial e glicemia demonstram controle adequado nos últimos 30 dias.
-              Nega novos episódios de crises agudas ou efeitos colaterais significativos das medicações em uso.
+              {patient.clinicalSummary || "Paciente apresenta quadro estável com boa adesão ao tratamento proposto."}
             </p>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-6">
@@ -100,7 +96,7 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
           <h2 className="text-lg font-bold uppercase tracking-wider">Prescrição Vigente</h2>
         </div>
         <div className="space-y-3">
-          {patient.medications.map((med: string, i: number) => (
+          {patient.medications && patient.medications.length > 0 ? patient.medications.map((med: string, i: number) => (
             <div key={i} className="flex items-center justify-between p-4 border border-gray-100 rounded-xl">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-[#fb9262]" />
@@ -108,7 +104,9 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
               </div>
               <span className="text-xs text-muted-foreground italic">Uso contínuo</span>
             </div>
-          ))}
+          )) : (
+            <p className="text-sm text-muted-foreground italic">Nenhum medicamento registrado.</p>
+          )}
         </div>
       </div>
 

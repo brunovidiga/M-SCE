@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Stethoscope, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,10 +13,10 @@ const Login = () => {
     <div className="min-h-screen bg-[#e8e5e9] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center p-3 bg-[#fb9262] rounded-2xl shadow-xl shadow-orange-200 mb-4">
-            <Stethoscope className="text-white" size={32} />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src="/logo.png" alt="M-SCE Logo" className="h-16 w-auto" />
           </div>
-          <h1 className="text-3xl font-bold text-[#2d3154]">M-SCE</h1>
+          <h1 className="text-3xl font-black text-[#4a4a4a] tracking-tighter">M-SCE</h1>
           <p className="text-muted-foreground">Medical Smart Clinical Explorer</p>
         </div>
 
