@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,9 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center mb-4">
-            <img src="/logo.png" alt="M-SCE Logo" className="h-16 w-auto" />
+            <div className="p-3 bg-accent rounded-2xl text-white shadow-lg shadow-orange-200">
+              <BrainCircuit size={48} />
+            </div>
           </div>
           <h1 className="text-3xl font-black text-[#4a4a4a] tracking-tighter">M-SCE</h1>
           <p className="text-muted-foreground">Medical Smart Clinical Explorer</p>

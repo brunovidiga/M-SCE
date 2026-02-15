@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Calendar, User, FileText, Pill, Activity } from 'lucide-react';
+import { Calendar, User, FileText, Pill, Activity, BrainCircuit } from 'lucide-react';
 
 interface MedicalReportTemplateProps {
   id: string;
@@ -20,7 +20,9 @@ const MedicalReportTemplate = ({ id, patient }: MedicalReportTemplateProps) => {
       {/* Header */}
       <div className="flex justify-between items-start border-b-2 border-[#fb9262] pb-8 mb-8">
         <div className="flex items-center gap-4">
-          <img src="/logo.png" alt="M-SCE Logo" className="h-12 w-auto" />
+          <div className="p-2 bg-accent rounded-xl text-white">
+            <BrainCircuit size={32} />
+          </div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter text-[#4a4a4a]">M-SCE</h1>
             <p className="text-sm text-muted-foreground uppercase tracking-widest">Medical Smart Clinical Explorer</p>

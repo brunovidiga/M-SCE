@@ -19,7 +19,8 @@ import {
   Video,
   Calculator,
   User,
-  ArrowRight
+  ArrowRight,
+  BrainCircuit
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -57,12 +58,10 @@ const SidebarContent = ({ pathname, onItemClick }: { pathname: string, onItemCli
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-10 px-2">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="M-SCE Logo" className="h-8 w-auto object-contain" onError={(e) => {
-            // Fallback caso a imagem não exista ainda
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.nextElementSibling?.classList.remove('hidden');
-          }} />
-          <span className="hidden font-black text-2xl tracking-tighter text-[#4a4a4a]">M-SCE</span>
+          <div className="p-1.5 bg-accent rounded-lg text-white">
+            <BrainCircuit size={24} />
+          </div>
+          <span className="font-black text-2xl tracking-tighter text-[#4a4a4a]">M-SCE</span>
         </Link>
         <div className={cn(
           "flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter",
