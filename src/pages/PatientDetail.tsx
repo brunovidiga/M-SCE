@@ -134,6 +134,11 @@ const PatientDetail = () => {
     showSuccess("Medicamentos atualizados!");
   };
 
+  const handleSaveSummary = (newSummary: string) => {
+    updatePatient(patient.id, { clinicalSummary: newSummary });
+    showSuccess("Resumo clínico atualizado!");
+  };
+
   const handleSavePrescription = (meds: { name: string; instructions: string }[]) => {
     const newPrescription = {
       id: Date.now(),
@@ -479,7 +484,10 @@ const PatientDetail = () => {
               </TabsContent>
 
               <TabsContent value="recordings" className="pt-4">
-                <ConsultationRecording />
+                <ConsultationRecording 
+                  summary={patient.clinicalSummary} 
+                  onSaveSummary={handleSaveSummary}
+                />
               </TabsContent>
 
               <TabsContent value="timeline" className="pt-4">

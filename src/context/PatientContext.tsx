@@ -21,6 +21,7 @@ export interface Patient {
   allergies?: string[];
   medications?: string[];
   prescriptions?: Prescription[];
+  clinicalSummary?: string;
 }
 
 interface PatientContextType {
@@ -47,6 +48,7 @@ const initialPatients: Patient[] = [
     bloodType: "O+", 
     allergies: ["Dipirona", "Penicilina"], 
     medications: ["Losartana 50mg", "Metformina 850mg"],
+    clinicalSummary: "Paciente relata recorrência de cefaleia pulsátil com fotofobia e náuseas. Uso de Sumatriptana com alívio parcial. Conduta sugerida: Manter Sumatriptana e associar Metoclopramida 10mg.",
     prescriptions: [
       {
         id: 101,

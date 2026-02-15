@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Play, 
   Pause, 
@@ -9,17 +9,39 @@ import {
   BrainCircuit, 
   MessageSquare,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Edit2,
+  Check,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
-const ConsultationRecording = () => {
+interface ConsultationRecordingProps {
+  summary?: string;
+  onSaveSummary?: (newSummary: string) => void;
+}
+
+const ConsultationRecording = ({ summary, onSaveSummary }: ConsultationRecordingProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(35);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedSummary, setEditedSummary] = useState(summary || "");
+
+  useEffect(() => {
+    setEditedSummary(summary || "");
+  }, [summary]);
+
+  const handleSave = () => {
+    if (onSaveSummary) {
+      onSaveSummary(editedSummary);
+    }
+    setIsEditing(false);
+  };
 
   const transcription = [
     { time: "00:12", speaker: "Dr. Ricardo", text: "Bom dia, Maria. Como você tem passado desde a nossa última consulta?", type: "neutral" },
@@ -104,17 +126,59 @@ const ConsultationRecording = () => {
       </div>
 
       {/* Resumo Executivo da IA */}
-      <Card className="border-none shadow-sm bg-accent/5 border border-accent/10">
+      <Card className="border-none shadow-sm bg-accent/5 border border-accent/10 group relative">
         <CardContent className="p-6 space-y-3">
-          <div className="flex items-center gap-2 text-accent">
-            <BrainCircuit size={20} />
-            <h5 className="font-bold text-sm">Resumo Clínico IA</h5>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-accent">
+              <BrainCircuit size={20} />
+              <h5 className="font-bold text-sm">Resumo Clínico IA</h5>
+            </div>
+            {!isEditing ? (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => setIsEditing(true)}
+              >
+                <Edit2 size={14} />
+              </Button>
+            ) : (
+              <div className="flex gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-full text-green-600"
+                  onClick={handleSave}
+                >
+                  <Check size={14} />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-full text-red-500"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditedSummary(summary || "");
+                  }}
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Paciente relata recorrência de cefaleia pulsátil com fotofobia e náuseas. 
-            Uso de Sumatriptana com alívio parcial. 
-            <strong> Conduta sugerida:</strong> Manter Sumatriptana e associar Metoclopramida 10mg.
-          </p>
+          
+          {isEditing ? (
+            <Textarea 
+              value={editedSummary}
+              onChange={(e) => setEditedSummary(e.target.value)}
+              className="min-h-[100px] text-xs bg-white border-accent/20 rounded-xl focus-visible:ring-accent"
+              autoFocus
+            />
+          ) : (
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {summary || "Nenhum resumo gerado para esta consulta."}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
