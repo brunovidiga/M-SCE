@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -11,7 +11,6 @@ import {
   Activity,
   Plus,
   Download,
-  MoreHorizontal,
   TrendingUp,
   Clock,
   FileSearch,
@@ -20,10 +19,11 @@ import {
   Mic,
   FileDown,
   Upload,
-  X,
   Eye,
   Edit2,
-  Check
+  Check,
+  MessageCircle,
+  Printer
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,6 +49,7 @@ import Layout from '@/components/Layout';
 import ReferralDialog from '@/components/ReferralDialog';
 import ConsultationRecording from '@/components/ConsultationRecording';
 import MedicalReportTemplate from '@/components/MedicalReportTemplate';
+import PrescriptionDialog from '@/components/PrescriptionDialog';
 import { exportPatientToPDF } from '@/utils/exportUtils';
 import { usePatients } from '@/context/PatientContext';
 import { showSuccess, showError } from '@/utils/toast';
@@ -74,7 +75,7 @@ interface Document {
 const PatientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getPatientById, updatePatient } = usePatients();
+  const { getPatientById, updatePatient, addPrescription } = usePatients();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
@@ -130,6 +131,15 @@ const PatientDetail = () => {
     updatePatient(patient.id, { medications: newList });
     setIsEditingMeds(false);
     showSuccess("Medicamentos atualizados!");
+  };
+
+  const handleSavePrescription = (meds: { name: string; instructions: string }[]) => {
+    const newPrescription = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('pt-BR'),
+      medications: meds
+    };
+    addPrescription(patient.id, newPrescription);
   };
 
   const handleExportPDF = async () => {
@@ -344,8 +354,12 @@ const PatientDetail = () => {
 
           <div className="lg:col-span-3 space-y-6">
             <Tabs defaultValue="evolution" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 rounded-2xl bg-white/50 backdrop-blur-md p-1 shadow-sm">
+              <TabsList className="grid w-full grid-cols-5 rounded-2xl bg-white/50 backdrop-blur-md p-1 shadow-sm">
                 <TabsTrigger value="evolution" className="rounded-xl">Evolução</TabsTrigger>
+                <TabsTrigger value="prescriptions" className="rounded-xl gap-2">
+                  <Pill size={14} />
+                  Receitas
+                </TabsTrigger>
                 <TabsTrigger value="recordings" className="rounded-xl gap-2">
                   <Mic size={14} />
                   Consultas
@@ -375,6 +389,63 @@ const PatientDetail = () => {
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="prescriptions" className="pt-4 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-[#2d3154]">Histórico de Receitas</h3>
+                  <PrescriptionDialog 
+                    patientName={patient.name} 
+                    patientPhone={patient.phone}
+                    onSave={handleSavePrescription}
+                  >
+                    <Button className="btn-accent rounded-xl gap-2">
+                      <Plus size={18} />
+                      Nova Receita
+                    </Button>
+                  </PrescriptionDialog>
+                </div>
+
+                <div className="space-y-3">
+                  {patient.prescriptions?.length ? patient.prescriptions.map((presc) => (
+                    <Card key={presc.id} className="border-none shadow-sm hover:shadow-md transition-all">
+                      <CardContent className="p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+                            <FileText size={20} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm">Receita Médica - {presc.date}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {presc.medications.length} medicamento(s) prescrito(s)
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="rounded-full text-green-600 hover:bg-green-50"
+                            onClick={() => {
+                              const text = `*Receita Médica - M-SCE*\n\n*Paciente:* ${patient.name}\n*Data:* ${presc.date}\n\n*Medicações:*\n${presc.medications.map(m => `- ${m.name}: ${m.instructions}`).join('\n')}`;
+                              window.open(`https://wa.me/${patient.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                          >
+                            <MessageCircle size={18} />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="rounded-full">
+                            <Printer size={18} />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )) : (
+                    <div className="text-center py-12 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                      <Pill size={48} className="mx-auto text-gray-300 mb-4" />
+                      <p className="text-muted-foreground">Nenhuma receita emitida ainda.</p>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="recordings" className="pt-4">
