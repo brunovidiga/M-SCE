@@ -18,6 +18,7 @@ import Onboarding from "./pages/Onboarding";
 import Settings from "./pages/Settings";
 import Telemedicine from "./pages/Telemedicine";
 import Calculators from "./pages/Calculators";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import ClinicalCopilot from "./components/ClinicalCopilot";
 import CommandMenu from "./components/CommandMenu";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/calculadoras" element={<Calculators />} />
             <Route path="/relatorios" element={<Reports />} />
             <Route path="/configuracoes" element={<Settings />} />
+            <Route path="/planos" element={<Plans />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ClinicalCopilot />

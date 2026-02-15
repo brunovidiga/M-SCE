@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Bell, 
@@ -20,6 +21,8 @@ import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 
 const Settings = () => {
+  const navigate = useNavigate();
+
   return (
     <Layout>
       <div className="space-y-8">
@@ -122,7 +125,13 @@ const Settings = () => {
                   <p className="text-lg font-bold text-[#2d3154]">Premium Professional</p>
                   <p className="text-xs text-green-600 font-medium mt-1">Ativo até 12/2024</p>
                 </div>
-                <Button variant="outline" className="w-full rounded-xl border-primary text-primary-foreground">Gerenciar Plano</Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full rounded-xl border-primary text-primary-foreground"
+                  onClick={() => navigate('/planos')}
+                >
+                  Gerenciar Plano
+                </Button>
               </CardContent>
             </Card>
 
