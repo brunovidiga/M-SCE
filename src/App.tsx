@@ -31,7 +31,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename="/M-SCE">
           <CommandMenu />
           <Routes>
             <Route path="/login" element={<Login />} />
