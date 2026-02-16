@@ -1,14 +1,15 @@
 import { defineConfig } from "vite";
-import dyadComponentTagger from "@dyad-sh/react-vite-component-tagger";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-export default defineConfig(() => ({
+// https://vitejs.dev/config/
+export default defineConfig(( ) => ({
+  base: "/M-SCE/", // Isso avisa ao projeto que ele está na pasta M-SCE do GitHub
   server: {
     host: "::",
     port: 8080,
   },
-  plugins: [dyadComponentTagger(), react()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
